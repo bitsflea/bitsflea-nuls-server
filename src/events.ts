@@ -1,8 +1,8 @@
 import { DataSource } from "typeorm"
 import { NULSAPI } from "nuls-api-v2"
-import { User } from "./entity/user.js"
+import { User } from "./entity/user"
 
-import config from "./config.js"
+import config from "./config"
 
 const { CONTRACT_BITSFLEA } = config
 

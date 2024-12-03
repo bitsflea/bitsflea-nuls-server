@@ -39,4 +39,11 @@ export class AsyncDataQueue {
             this.pendingResolvers.push(resolve);
         });
     }
+
+    close() {
+        while (this.pendingResolvers.length > 0) {
+            const resolver = this.pendingResolvers.shift();
+            resolver(null);
+        }
+    }
 }

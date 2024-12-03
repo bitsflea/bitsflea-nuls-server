@@ -4,7 +4,6 @@
         "outDir": "dist",
         "rootDir": "src",
         "lib": [
-            "es5",
             "es6"
         ],
         "target": "es6",

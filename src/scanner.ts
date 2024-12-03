@@ -1,9 +1,9 @@
 import { NULSAPI } from "nuls-api-v2"
-import { AsyncDataQueue } from "./queue.js"
-import { processEvent } from "./events.js"
+import { AsyncDataQueue } from "./queue"
+import { processEvent } from "./events"
 import { DataSource } from "typeorm"
 
-import config from "./config.js"
+import config from "./config"
 
 const { POLL_INTERVAL } = config
 
@@ -21,6 +21,7 @@ export class Scanner {
     queue: AsyncDataQueue
 
     isRun: boolean
+    runCount: number
 
     constructor(currentHeight: number, nulsConfg: any, contracts: Array<string>, db: DataSource) {
         this.db = db
@@ -30,6 +31,7 @@ export class Scanner {
         this.listenContracts = contracts
         this.queue = new AsyncDataQueue()
         this.isRun = false
+        this.runCount = 0
     }
 
     async sleep(interval: number) {
@@ -71,10 +73,11 @@ export class Scanner {
 
     // 监听区块和事件
     async pollBlocks() {
+        this.runCount += 1
         while (this.isRun) {
             try {
-                // const latestHeight = await getLatestBlockHeight();
-                const latestHeight = 11586150;
+                const latestHeight = await this.getLatestBlockHeight();
+                // const latestHeight = 11586150;
 
                 // 如果区块高度未变化，不执行操作
                 if (this.currentHeight >= latestHeight) {
@@ -113,21 +116,25 @@ export class Scanner {
             await this.sleep(POLL_INTERVAL);
         }
         console.log("listener stopped.");
+        this.runCount -= 1
+        this.queue.close()
     }
 
     /**
      * 处理事件队列
      */
     async startProcEvent() {
+        this.runCount += 1
         while (this.isRun) {
             try {
                 let event = await this.queue.dequeue();
-                // console.log("event:", event);
-                processEvent(event, this.db, this.client);
+                if (event)
+                    processEvent(event, this.db, this.client);
             } catch (error) {
                 console.error("Error process event: ", error)
             }
         }
+        this.runCount -= 1
     }
 
     // 启动监听服务
@@ -141,7 +148,11 @@ export class Scanner {
         this.pollBlocks()
     }
 
-    stop() {
+    async stop() {
         this.isRun = false
+        while (this.runCount > 0) {
+            // console.debug("count:", this.runCount)
+            await this.sleep(0.5)
+        }
     }
 }
