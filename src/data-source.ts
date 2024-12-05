@@ -2,6 +2,11 @@
 import "reflect-metadata"
 import { DataSource } from "typeorm"
 import { User } from "./entity/user"
+import { Product } from "./entity/product"
+import { Reviewer } from "./entity/reviewer"
+import { Order } from "./entity/order"
+import { ProductReturn } from "./entity/productReturn"
+import { Arbitration } from "./entity/arbitration"
 
 import config from "./config"
 
@@ -16,7 +21,7 @@ export const AppDataSource = new DataSource({
     database: "bitsflea",
     synchronize: true,
     logging: false,
-    entities: [User],
+    entities: [User, Product, Reviewer, Order, ProductReturn, Arbitration],
     subscribers: [],
     migrations: [],
 })
