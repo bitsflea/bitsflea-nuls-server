@@ -352,6 +352,7 @@ const events = {
             arbitration.type = a.type
             arbitration.status = a.status
             arbitration.operator = a.plaintiff
+            arbitration.createTime = a.createTime
             await arbitration.save()
         }
     },

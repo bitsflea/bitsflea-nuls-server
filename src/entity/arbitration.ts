@@ -43,4 +43,9 @@ export class Arbitration extends BaseEntity {
      */
     @Column({ nullable: true })
     operator: string
+    /**
+     * 创建时间
+     */
+    @Column()
+    createTime:number
 }

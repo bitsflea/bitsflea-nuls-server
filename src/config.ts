@@ -6,7 +6,7 @@ export default {
     // 轮询间隔（秒）
     POLL_INTERVAL: 5,
     API_URL: "http://beta.api.nuls.io/jsonrpc",
-    CONTRACT_BITSFLEA: "tNULSeBaN5kC41vEf1VEcpCCguJp4FyMgk9xzs",
+    CONTRACT_BITSFLEA: "tNULSeBaN1VzkunHeSch38ug4CS92Edseu5fM7",
 
     db_host: "localhost",
     db_port: 3306,
