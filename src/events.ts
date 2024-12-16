@@ -404,9 +404,9 @@ const events = {
 }
 
 
-export function processEvent(data: any, db: DataSource, api: NULSAPI) {
+export function processEvent(data: any, scanner: any) {
     let fun = events[data.event];
     if (fun && typeof fun === "function") {
-        fun(data.payload, data.blockNumber, db, api);
+        fun(data.payload, data.blockNumber, scanner.db, scanner.api);
     }
 }
