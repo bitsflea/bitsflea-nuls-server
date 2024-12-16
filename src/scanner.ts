@@ -56,6 +56,7 @@ export class Scanner {
     // 解析合约事件日志
     async parseContractEventLogs(txHashs: string | Array<string>) {
         let txHs = Array.isArray(txHashs) ? txHashs : [txHashs];
+        if (txHs.length < 1) return [];
         // console.log("txHs:", txHs);
         const result = await this.client.getContractTxResultList(txHs);
         // console.log("result:", result);
