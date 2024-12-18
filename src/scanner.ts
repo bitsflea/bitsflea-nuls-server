@@ -1,41 +1,44 @@
-import { NULSAPI } from "nuls-api-v2"
+import { NULSAPI, getSender } from "nuls-api-v2"
 import { AsyncDataQueue } from "./queue"
-import { processEvent } from "./events"
+import { Events } from "./events"
 import { DataSource } from "typeorm"
 
 import config from "./config"
 
-const { POLL_INTERVAL } = config
+const { POLL_INTERVAL, contracts } = config
 
 export class Scanner {
     db: DataSource
-
     client: NULSAPI
-
     currentHeight: number
-
     listenContracts: Array<string>
-
     maxRequest: number
-
     queue: AsyncDataQueue
-
     isRun: boolean
     runCount: number
+    /**
+     * 接受一个返回对象{address,template}
+     */
     initHandel: Function
+    events: Events
+    contractMap: Record<string, string>
 
-    constructor(currentHeight: number, nulsConfg: any, contracts: Array<string>, db: DataSource) {
+    constructor(currentHeight: number, nulsConfg: any, db: DataSource) {
         this.db = db
         this.currentHeight = typeof currentHeight !== "number" ? parseInt(currentHeight) : currentHeight;
         this.maxRequest = 50
         this.client = new NULSAPI(nulsConfg)
-        this.listenContracts = contracts
+        this.listenContracts = Object.values(contracts)
         this.queue = new AsyncDataQueue()
         this.isRun = false
         this.runCount = 0
+        this.events = new Events("./mappings")
+        this.contractMap = contracts
     }
 
-    addContract(contract: string) {
+    addContract(contract: string, template: string) {
+        this.events.addNewContract(contract, template)
+
         this.listenContracts.push(contract)
         this.listenContracts = [...new Set(this.listenContracts)]
     }
@@ -43,8 +46,12 @@ export class Scanner {
     async initDBContracts() {
         if (this.initHandel) {
             let cs = await this.initHandel()
-            if (cs && cs.length > 0)
-                this.listenContracts = this.listenContracts.concat(cs)
+            if (cs && cs.length > 0) {
+                this.listenContracts = this.listenContracts.concat(Object.keys(cs))
+                for (let c of cs) {
+                    this.events.addNewContract(c.address, c.template)
+                }
+            }
         }
     }
 
@@ -64,7 +71,7 @@ export class Scanner {
         const block = await this.client.getBlockByHeight(blockHeight);
         // console.log("block", block);
         const transactions = block.txs.filter((tx: any) => tx.type === 16 && tx.status === 1); // 16: 合约交易类型
-        // console.log("transactions:", transactions);
+        // console.log("transactions:", JSON.stringify(transactions));
         return transactions;
     }
 
@@ -80,11 +87,12 @@ export class Scanner {
             // console.log("hs:", hs);
             let data = result[hs];
             // console.log("data:", data);
-            if (data && data.success && data.events && this.listenContracts.includes(data.contractAddress)) {
+            if (data && data.success && data.events) {
                 events = events.concat(data.events.map((event: string) => {
-                    let tx = txs.find((t) => t.hash = hs)
+                    let tx = txs.find((t) => t.hash == hs)
                     return Object.assign(JSON.parse(event), { ...tx })
                 }));
+                // events = events.filter(ev => this.listenContracts.includes(ev.contractAddress))  // 不能在这里过滤，因为处理不了新创建的合约
             }
         }
         return events;
@@ -92,6 +100,7 @@ export class Scanner {
 
     // 监听区块和事件
     async pollBlocks() {
+        await this.events.loadMappings()
         await this.initDBContracts()
         this.runCount += 1
         while (this.isRun) {
@@ -112,7 +121,7 @@ export class Scanner {
                     console.debug(`Processing block: ${height}... Unprocessed tx count: ${txs.length}`);
                     const transactions = await this.getContractTransactions(height);
                     // console.log(transactions)
-                    txs = txs.concat(transactions.map((tx: any) => ({ hash: tx.hash, timestamp: tx.timestamp, inBlockIndex: tx.inBlockIndex })));
+                    txs = txs.concat(transactions.map((tx: any) => ({ hash: tx.hash, timestamp: tx.timestamp, inBlockIndex: tx.inBlockIndex, from: getSender(tx.txDataHex) })));
                     unprocessedBlocks += 1;
                     // console.log("txHashs:", txHashs);
                     if (height == latestHeight || txs.length >= this.maxRequest || (unprocessedBlocks >= 10 && txs.length > 0) || (!this.isRun && txs.length > 0)) {
@@ -125,10 +134,11 @@ export class Scanner {
                                 }
                                 return a.inBlockIndex - b.inBlockIndex;
                             })
-                            events.forEach(async (event) => {
+                            for (let event of events) {
                                 // console.debug("event: ", event);
+                                // await this.events.processEvent(event, this);
                                 await this.queue.enqueue(event)
-                            });
+                            }
                         }
                         txs = [];
                         unprocessedBlocks = 0;
@@ -153,7 +163,7 @@ export class Scanner {
         }
         this.runCount -= 1
         this.queue.close()
-        console.info("listener stopped.");
+        console.info("Service stopped.");
     }
 
     /**
@@ -163,9 +173,11 @@ export class Scanner {
         this.runCount += 1
         while (this.isRun) {
             try {
-                let event = await this.queue.dequeue();
-                if (event)
-                    processEvent(event, this);
+                let event = await this.queue.dequeue()
+                console.debug("event:", event)
+                if (event && this.listenContracts.includes(event.contractAddress)) {
+                    await this.events.processEvent(event, this)
+                }
             } catch (error) {
                 console.error("Error process event: ", error)
             }
@@ -177,7 +189,7 @@ export class Scanner {
     startListener() {
         // 初始化当前高度
         // currentHeight = await getLatestBlockHeight();
-        console.log(`Starting listener from block ${this.currentHeight}...`);
+        console.info(`Starting listener from block ${this.currentHeight}...`);
 
         this.isRun = true
         this.startProcEvent()

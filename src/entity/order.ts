@@ -26,12 +26,12 @@ export class Order extends BaseEntity {
     /**
      * 订单金额
      */
-    @Column()
+    @Column({ default: "0" })
     amount: string
     /**
      * 邮费金额
      */
-    @Column()
+    @Column({ default: "0" })
     postage: string
     /**
      * 订单状态,值对应 OrderStatus

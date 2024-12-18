@@ -8,7 +8,6 @@
     "dotenv": "^16.4.5",
     "jayson": "^4.1.3",
     "mysql2": "^3.11.5",
-    "node-localstorage": "^3.0.5",
     "nuls-api-v2": "https://github.com/xiangxn/nuls-api-v2.git",
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.20"
