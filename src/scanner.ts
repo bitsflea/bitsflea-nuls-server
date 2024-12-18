@@ -16,10 +16,6 @@ export class Scanner {
     queue: AsyncDataQueue
     isRun: boolean
     runCount: number
-    /**
-     * 接受一个返回对象{address,template}
-     */
-    initHandel: Function
     events: Events
     contractMap: Record<string, string>
 
@@ -44,13 +40,16 @@ export class Scanner {
     }
 
     async initDBContracts() {
-        if (this.initHandel) {
-            let cs = await this.initHandel()
-            if (cs && cs.length > 0) {
-                this.listenContracts = this.listenContracts.concat(Object.keys(cs))
-                for (let c of cs) {
-                    this.events.addNewContract(c.address, c.template)
-                }
+        let funs = Object.values(this.events.templates)
+        let cs = []
+        for (let fun of funs) {
+            let data = await fun()
+            cs = cs.concat(data)
+        }
+        if (cs && cs.length > 0) {
+            this.listenContracts = this.listenContracts.concat(Object.keys(cs))
+            for (let c of cs) {
+                this.events.addNewContract(c.address, c.template)
             }
         }
     }

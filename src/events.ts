@@ -9,15 +9,19 @@ const __dirname = path.dirname(__filename);
 
 export class Events {
     mapping: Record<string, Record<string, Function>>
+    templates: Record<string, Function>
     contractPrefix: string
     eventPrefix: string
+    templatePrefix: string
     directory: string
 
-    constructor(directory: string, contractPrefix: string = "mapping", eventPrefix: string = "handle") {
+    constructor(directory: string, contractPrefix: string = "mapping", eventPrefix: string = "handle", templatePrefix: string = "getAll") {
         this.contractPrefix = contractPrefix
         this.eventPrefix = eventPrefix
+        this.templatePrefix = templatePrefix
         this.directory = path.resolve(__dirname, directory)
         this.mapping = {}
+        this.templates = {}
     }
 
     /**
@@ -48,8 +52,12 @@ export class Events {
             const handles: Record<string, Function> = {}
             // 遍历导出的内容，将所有函数添加到结果对象
             for (const [key, value] of Object.entries(module)) {
-                if (key.startsWith(this.eventPrefix) && typeof value === 'function') {
-                    handles[key.substring(this.eventPrefix.length)] = value; // 以函数名去掉前缀为 key
+                if (typeof value === 'function') {
+                    if (key.startsWith(this.eventPrefix)) {
+                        handles[key.substring(this.eventPrefix.length)] = value // 以函数名去掉前缀为 key
+                    } else if (key.startsWith(this.templatePrefix)) {
+                        this.templates[key.substring(this.templatePrefix.length)] = value
+                    }
                 }
             }
             const mKey = file.substring(this.contractPrefix.length).replace(fileExtension, "")
