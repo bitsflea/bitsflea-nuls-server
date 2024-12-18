@@ -157,7 +157,7 @@ export class Scanner {
             } catch (error) {
                 console.error('Error polling blocks:', error);
             }
-            console.log("this.currentHeight:", this.currentHeight)
+            console.info("currentHeight:", this.currentHeight)
             await this.sleep(POLL_INTERVAL);
         }
         this.runCount -= 1

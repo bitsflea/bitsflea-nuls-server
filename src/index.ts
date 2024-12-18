@@ -1,10 +1,10 @@
 import "./console"
 import { AppDataSource } from "./data-source"
 import jayson from "jayson/promise/index.js"
-import { NulsRPC } from "./rpc"
 import { Scanner } from "./scanner"
 import config from "./config"
 import { Storage } from "nuls-api-v2"
+import { Rpcs } from "./rpc"
 
 const localStorage: Storage = new Storage();
 
@@ -28,8 +28,8 @@ process.on('SIGINT', async function () {
 });
 
 async function main() {
-    await localStorage.init();
-    await AppDataSource.initialize();
+    await localStorage.init()
+    await AppDataSource.initialize()
 
     let cache = localStorage.getItem(CACHE_KEY_CURRENTHEIGHT)
     // console.info("cache:", cache)
@@ -44,13 +44,15 @@ async function main() {
         isBeta: true
     }, AppDataSource)
 
-    scanner.startListener();
+    scanner.startListener()
 
-    const nuls = new NulsRPC(AppDataSource)
+    const rpcs = new Rpcs()
+    await rpcs.loadMappings()
+
     // create a server
-    server = new jayson.Server(nuls.getMethods());
+    server = new jayson.Server(rpcs.mapping);
 
-    server.http().listen(3000);
+    server.http().listen(3000)
 }
 
 main().catch((error) => console.log("Error: ", error))

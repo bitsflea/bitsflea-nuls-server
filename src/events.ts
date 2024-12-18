@@ -63,7 +63,7 @@ export class Events {
             const mKey = file.substring(this.contractPrefix.length).replace(fileExtension, "")
             this.mapping[contracts[mKey]] = handles
         }
-        // console.log(this.mapping)
+        console.debug("Event mappings:", this.mapping)
     }
 
     /**
