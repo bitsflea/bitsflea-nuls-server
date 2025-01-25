@@ -77,4 +77,10 @@ export class User extends BaseEntity {
      */
     @Column()
     encryptKey: string
+
+    /**
+     * 扩展信息
+     */
+    @Column()
+    extendInfo:string
 }

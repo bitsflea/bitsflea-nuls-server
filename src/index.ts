@@ -5,6 +5,9 @@ import { Scanner } from "./scanner"
 import config from "./config"
 import { Storage } from "nuls-api-v2"
 import { Rpcs } from "./rpc"
+import CORS from "cors"
+import connect from "connect"
+import bodyParser from "body-parser"
 
 const localStorage: Storage = new Storage();
 
@@ -50,9 +53,12 @@ async function main() {
     await rpcs.loadMappings()
 
     // create a server
-    server = new jayson.Server(rpcs.mapping);
-
-    server.http().listen(3000)
+    const app = connect()
+    app.use(CORS());
+    server = new jayson.Server(rpcs.mapping)
+    app.use(bodyParser.json())
+    app.use(server.middleware());
+    app.listen(3000);
 }
 
 main().catch((error) => console.log("Error: ", error))

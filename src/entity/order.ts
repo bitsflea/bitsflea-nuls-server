@@ -91,6 +91,6 @@ export class Order extends BaseEntity {
     /**
      * 订单完成或取消后超过这个时间则可能被清理
      */
-    @Column()
+    @Column({ nullable: true })
     clearTime: number
 }

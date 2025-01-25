@@ -41,6 +41,7 @@ async function updataUser(uid: string, api: NULSAPI) {
     user.buyTotal = u.buyTotal
     user.referralTotal = u.referralTotal
     user.encryptKey = u.encryptKey
+    user.extendInfo = u.extendInfo
     await user.save()
 }
 
@@ -84,7 +85,7 @@ export async function handlePublishProductEvent(event: any, scanner: any) {
         product = new Product()
         product.pid = pid
     }
-    let p = await scanner.client.invokeView(CONTRACT_BITSFLEA, "geProduct", null, [pid])
+    let p = await scanner.client.invokeView(CONTRACT_BITSFLEA, "getProduct", null, [pid])
 
     product.uid = p.uid
     product.description = p.description
