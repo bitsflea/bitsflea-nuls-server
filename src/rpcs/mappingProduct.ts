@@ -62,6 +62,12 @@ export async function handleGetUsers(args: any) {
     return await query.orderBy("users.lastActiveTime", "DESC").skip(page * pageSize).take(pageSize).getMany()
 }
 
+export async function handleGetUsersByIds(args: any) {
+    let [ids] = args
+    let query = User.createQueryBuilder("users").where("users.uid IN (:...ids)", { ids })
+    return await query.orderBy("users.lastActiveTime", "DESC").getMany()
+}
+
 export async function handleGetArbitrations(args: any) {
     let [uid, page, pageSize, type, status] = args
     page -= 1
