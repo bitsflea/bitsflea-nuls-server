@@ -27,6 +27,12 @@ export async function handleGetProducts(args: any) {
     return await query.orderBy("products.publishTime", "DESC").skip(page * pageSize).take(pageSize).getMany()
 }
 
+export async function handleGetProductsByIds(args: any) {
+    let [ids] = args
+    let query = Product.createQueryBuilder("products").where("products.pid IN (:...ids)", { ids })
+    return await query.orderBy("products.publishTime", "DESC").getMany()
+}
+
 export async function handleGetOrders(args: any) {
     let [uid, page, pageSize, status] = args
     page -= 1
