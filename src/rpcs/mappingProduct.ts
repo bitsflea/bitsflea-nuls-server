@@ -38,7 +38,7 @@ export async function handleGetOrders(args: any) {
     page -= 1
     if (page < 0) page = 0
     let query = Order.createQueryBuilder("orders").where("orders.uid = :uid", { uid })
-    if (status !== undefined) {
+    if (status !== undefined && status !== null) {
         query = query.andWhere("orders.status = :status", { status })
     }
     return await query.orderBy("orders.createTime", "DESC").skip(page * pageSize).take(pageSize).getMany()
