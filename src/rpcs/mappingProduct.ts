@@ -34,14 +34,24 @@ export async function handleGetProductsByIds(args: any) {
 }
 
 export async function handleGetOrders(args: any) {
-    let [uid, page, pageSize, status] = args
+    let [uid, page, pageSize, status, isBuyer] = args
     page -= 1
     if (page < 0) page = 0
-    let query = Order.createQueryBuilder("orders").where("orders.uid = :uid", { uid })
+    let query = Order.createQueryBuilder("orders")
+    if (!isBuyer) {
+        query = query.where("orders.buyer = :uid", { uid })
+    } else {
+        query = query.where("orders.seller = :uid", { uid })
+    }
     if (status !== undefined && status !== null) {
         query = query.andWhere("orders.status = :status", { status })
     }
-    return await query.orderBy("orders.createTime", "DESC").skip(page * pageSize).take(pageSize).getMany()
+    try {
+        return await query.orderBy("orders.createTime", "DESC").skip(page * pageSize).take(pageSize).getMany()
+    } catch (e) {
+        console.log(e)
+    }
+
 }
 
 export async function handleGetUsers(args: any) {
