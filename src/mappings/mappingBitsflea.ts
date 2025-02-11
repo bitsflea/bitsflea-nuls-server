@@ -184,7 +184,13 @@ export async function handleCreateOrderEvent(event: any, scanner: any) {
 
     let product = await Product.findOneBy({ pid })
     if (product) {
-        product.status = 400
+        if (product.isRetail === true) {
+            if (product.stockCount <= 1) {
+                product.status = 400
+            }
+        } else {
+            product.status = 400
+        }
         await product.save()
     }
 }
