@@ -184,13 +184,9 @@ export async function handleCreateOrderEvent(event: any, scanner: any) {
 
     let product = await Product.findOneBy({ pid })
     if (product) {
-        if (product.isRetail === true) {
-            if (product.stockCount <= 1) {
-                product.status = 400
-            }
-        } else {
-            product.status = 400
-        }
+        let p = await scanner.client.invokeView(CONTRACT_BITSFLEA, "getProduct", null, [pid])
+        product.stockCount = p.stockCount
+        product.status = p.status
         await product.save()
     }
 }
