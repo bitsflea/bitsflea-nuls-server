@@ -28,7 +28,7 @@ export class Scanner {
         this.queue = new AsyncDataQueue()
         this.isRun = false
         this.runCount = 0
-        this.events = new Events("./mappings")
+        this.events = new Events("./events")
         this.contractMap = contracts
     }
 
