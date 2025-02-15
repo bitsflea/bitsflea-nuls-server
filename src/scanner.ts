@@ -4,6 +4,7 @@ import { Events } from "./events"
 import { DataSource } from "typeorm"
 
 import config from "./config"
+import { IPFS } from "./ipfs"
 
 const { POLL_INTERVAL, contracts } = config
 
@@ -18,6 +19,7 @@ export class Scanner {
     runCount: number
     events: Events
     contractMap: Record<string, string>
+    ipfs: IPFS
 
     constructor(currentHeight: number, nulsConfg: any, db: DataSource) {
         this.db = db
@@ -30,6 +32,7 @@ export class Scanner {
         this.runCount = 0
         this.events = new Events("./events")
         this.contractMap = contracts
+        this.ipfs = new IPFS()
     }
 
     addContract(contract: string, template: string) {
