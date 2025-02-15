@@ -208,6 +208,7 @@ export async function handleCancelOrderEvent(event: any, scanner: any) {
     let order = await Order.findOneBy({ oid })
     if (order) {
         order.status = 200
+        order.endTime = time
         await order.save()
 
         if (order.payTimeOut < time) {
@@ -218,6 +219,12 @@ export async function handleCancelOrderEvent(event: any, scanner: any) {
             if (g && user) {
                 await subCredit(g, user, g.creditPayTimeOut)
             }
+        }
+
+        let pr = await ProductReturn.findOneBy({ oid })
+        if (pr) {
+            pr.endTime = time
+            await pr.save()
         }
     }
 

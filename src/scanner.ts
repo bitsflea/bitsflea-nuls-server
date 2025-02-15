@@ -19,7 +19,7 @@ export class Scanner {
     runCount: number
     events: Events
     contractMap: Record<string, string>
-    ipfs: IPFS
+    // ipfs: IPFS
 
     constructor(currentHeight: number, nulsConfg: any, db: DataSource) {
         this.db = db
@@ -32,7 +32,7 @@ export class Scanner {
         this.runCount = 0
         this.events = new Events("./events")
         this.contractMap = contracts
-        this.ipfs = new IPFS()
+        // this.ipfs = new IPFS()
     }
 
     addContract(contract: string, template: string) {
@@ -55,7 +55,7 @@ export class Scanner {
                 this.events.addNewContract(c.address, c.template)
             }
         }
-        await this.ipfs.init()
+        // await this.ipfs.init()
     }
 
     async sleep(interval: number) {
