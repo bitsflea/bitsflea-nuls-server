@@ -12,7 +12,8 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "esModuleInterop": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "skipLibCheck": true
     },
     "include": [
         "src/**/*.ts"

@@ -1,6 +1,6 @@
 import { NULSAPI, getSender } from "nuls-api-v2"
 import { AsyncDataQueue } from "./queue"
-import { Events } from "./events"
+import { Events } from "./event"
 import { DataSource } from "typeorm"
 
 import config from "./config"
