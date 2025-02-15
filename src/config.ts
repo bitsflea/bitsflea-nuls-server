@@ -9,7 +9,7 @@ export default {
     API_URL: "http://beta.api.nuls.io/jsonrpc",
 
     // 数据库
-    db_host: "23.94.67.168",
+    db_host: "localhost",
     db_port: 3306,
     db_name: "bitsflea",
     db_username: "root",
@@ -19,7 +19,7 @@ export default {
     start_block: 12220710,
     // 配置合约名映射
     contracts: {
-        "Bitsflea": "tNULSeBaN2WVZgHPdvL991MCu7J1p3dFgX8HcY",
+        "Bitsflea": "tNULSeBaN8NhBGGVosk1ws2BuocWSeequQ6STx",
     },
     WNULS: "tNULSeBaMx9aG8vD8rsDorNtGKB4Mc9wpKs127", // NULSd6Hgmqgq924JD5aukswyrqrg6xjpTzH5w
 }
