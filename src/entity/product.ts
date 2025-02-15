@@ -17,14 +17,13 @@ export class Product extends BaseEntity {
     uid: string
     /**
      * 商品名称
-     * 根据description从ipfs获取
      */
     @Column()
     name: string
     /**
      * 商品详细说明, 存储在IPFS的url或者cid
      * 格式如下:
-     * {"title":"","description":"","photos":[]}
+     * {"description":"","photos":[]}
      */
     @Column()
     description: string

@@ -9,14 +9,14 @@ export default {
     API_URL: "http://beta.api.nuls.io/jsonrpc",
 
     // 数据库
-    db_host: "localhost",
+    db_host: "23.94.67.168",
     db_port: 3306,
     db_name: "bitsflea",
     db_username: "root",
     db_password: process.env.DB_PASSWORD,
 
     // 开始扫描的块号
-    start_block: 12204686,
+    start_block: 12220710,
     // 配置合约名映射
     contracts: {
         "Bitsflea": "tNULSeBaN2WVZgHPdvL991MCu7J1p3dFgX8HcY",

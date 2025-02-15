@@ -86,11 +86,10 @@ export async function handlePublishProductEvent(event: any, scanner: any) {
         product.pid = pid
     }
     let p = await scanner.client.invokeView(CONTRACT_BITSFLEA, "getProduct", null, [pid])
-    let des = await scanner.ipfs.getJSON(p.description)
 
     product.uid = p.uid
     product.description = p.description
-    product.name = des.name
+    product.name = p.name
     product.category = p.category
     product.status = p.status
     product.isNew = p.isNew

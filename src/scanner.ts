@@ -55,6 +55,7 @@ export class Scanner {
                 this.events.addNewContract(c.address, c.template)
             }
         }
+        await this.ipfs.init()
     }
 
     async sleep(interval: number) {
