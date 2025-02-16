@@ -7,7 +7,7 @@ import { Reviewer } from "../entity/reviewer"
 
 export async function handleGetProducts(args: any) {
     // console.log("handleGetProducts args:", args)
-    let [page, pageSize, category, uid, status] = args
+    let [page, pageSize, category, uid, status, name] = args
     page -= 1
     if (page < 0) page = 0
     if (status == null) status = 100
@@ -22,6 +22,9 @@ export async function handleGetProducts(args: any) {
     }
     if (uid) {
         query = query.andWhere("products.uid = :uid", { uid })
+    }
+    if (name) {
+        query = query.andWhere("products.name LIKE :name", { name: `%${name}%` })
     }
     // console.log("query:", query.orderBy("products.publishTime", "DESC").skip(page * pageSize).take(pageSize).getSql())
     return await query.orderBy("products.publishTime", "DESC").skip(page * pageSize).take(pageSize).getMany()
