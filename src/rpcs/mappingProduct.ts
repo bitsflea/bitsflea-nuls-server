@@ -6,7 +6,7 @@ import { User } from "../entity/user"
 import { Reviewer } from "../entity/reviewer"
 
 export async function handleGetProducts(args: any) {
-    console.log("handleGetProducts args:", args)
+    // console.log("handleGetProducts args:", args)
     let [page, pageSize, category, uid, status, name] = args
     page -= 1
     if (page < 0) page = 0
