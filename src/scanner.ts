@@ -181,6 +181,7 @@ export class Scanner {
                 if (event && this.listenContracts.includes(event.contractAddress)) {
                     await this.events.processEvent(event, this)
                 }
+                await this.sleep(0.2)
             } catch (error) {
                 console.error("Error process event: ", error)
             }
