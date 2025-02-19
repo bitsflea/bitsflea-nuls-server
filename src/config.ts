@@ -16,10 +16,10 @@ export default {
     db_password: process.env.DB_PASSWORD,
 
     // 开始扫描的块号
-    start_block: 12220710,
+    start_block: 12248720,
     // 配置合约名映射
     contracts: {
-        "Bitsflea": "tNULSeBaN8NhBGGVosk1ws2BuocWSeequQ6STx",
+        "Bitsflea": "tNULSeBaN7MkdczPYAQH4GvKrhmCQUB7p7Qtr2",
     },
     WNULS: "tNULSeBaMx9aG8vD8rsDorNtGKB4Mc9wpKs127", // NULSd6Hgmqgq924JD5aukswyrqrg6xjpTzH5w
 }

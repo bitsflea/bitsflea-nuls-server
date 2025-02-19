@@ -45,20 +45,6 @@ async function updataUser(uid: string, api: NULSAPI) {
     await user.save()
 }
 
-
-async function subCredit(g: any, user: User, value: number) {
-    user.creditValue -= value < 0 ? -value : value;
-    if (user.creditValue < 0) user.creditValue = 0
-    if (user.creditValue < g.creditReviewerLimit && user.isReviewer) {
-        user.isReviewer = false;
-    }
-    if (user.creditValue <= 0) {
-        user.status = 1;
-    }
-    await user.save()
-}
-
-
 async function getProductReturn(api: NULSAPI, oid: string) {
     return await api.invokeView(CONTRACT_BITSFLEA, "getProductReturn", null, [oid])
 }
@@ -212,13 +198,7 @@ export async function handleCancelOrderEvent(event: any, scanner: any) {
         await order.save()
 
         if (order.payTimeOut < time) {
-            let [g, user] = await Promise.all([
-                getGlobal(scanner.client),
-                User.findOneBy({ uid: buyer })
-            ])
-            if (g && user) {
-                await subCredit(g, user, g.creditPayTimeOut)
-            }
+            await updataUser(buyer, scanner.client)
         }
 
         let pr = await ProductReturn.findOneBy({ oid })
@@ -250,8 +230,7 @@ export async function handleShipmentsEvent(event: any, scanner: any) {
                 await pr.save()
 
                 if (time > pr.shipTimeOut) {
-                    let buyer = await User.findOneBy({ uid: order.buyer })
-                    await subCredit(g, buyer, g.creditShipmentsTimeout)
+                    await updataUser(order.buyer, scanner.client)
                 }
             }
         } else {
@@ -262,8 +241,7 @@ export async function handleShipmentsEvent(event: any, scanner: any) {
             await order.save()
 
             if (time > order.shipTimeOut) {
-                let seller = await User.findOneBy({ uid: order.seller })
-                await subCredit(g, seller, g.creditShipmentsTimeout)
+                await updataUser(order.seller, scanner.client)
             }
         }
     }
@@ -319,7 +297,7 @@ export async function handleCompleteOrderEvent(event: any, scanner: any) {
             buyer.buyTotal += 1
             buyer.creditValue += g.creditCompleteTransaction
             if (order.receiptTimeOut < time) {
-                await subCredit(g, buyer, g.creditConfirmReceiptTimeout)
+                await updataUser(buyer.uid, scanner.client)
             } else {
                 await buyer.save()
             }
@@ -366,25 +344,16 @@ export async function handleArbitUpdateEvent(event: any, scanner: any) {
                     case 0:
                         let order = await Order.findOneBy({ oid: a.orderId })
                         if (a.winner == order.buyer) {
-                            let seller = await User.findOneBy({ uid: order.seller })
-                            if (seller) {
-                                await subCredit(g, seller, g.arbitLosing)
-                            }
+                            await updataUser(order.seller, scanner.client)
                         } else {
-                            let buyer = await User.findOneBy({ uid: order.buyer })
-                            if (buyer) {
-                                await subCredit(g, buyer, g.arbitLosing)
-                            }
+                            await updataUser(order.buyer, scanner.client)
                         }
                         break
                     case 100:
                     case 200:
                     case 300:
                         let uid = a.winner == a.plaintiff ? a.defendant : a.plaintiff
-                        let user = await User.findOneBy({ uid })
-                        if (user) {
-                            await subCredit(g, user, g.arbitLosing)
-                        }
+                        await updataUser(uid, scanner.client)
                         break
                     default:
                         break
