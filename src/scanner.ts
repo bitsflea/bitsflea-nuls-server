@@ -50,7 +50,7 @@ export class Scanner {
             cs = cs.concat(data)
         }
         if (cs && cs.length > 0) {
-            this.listenContracts = this.listenContracts.concat(Object.keys(cs))
+            this.listenContracts = this.listenContracts.concat(cs.map((v) => v.address))
             for (let c of cs) {
                 this.events.addNewContract(c.address, c.template)
             }
