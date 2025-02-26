@@ -153,7 +153,7 @@ export async function handleReviewProductEvent(event: any, scanner: any) {
 }
 
 export async function handleCreateOrderEvent(event: any, scanner: any) {
-    let { oid, pid, seller, buyer, amount, postage, createTime, payTimeOut } = event.payload
+    let { oid, pid, seller, buyer, amount, postage, createTime, payTimeOut, receiptInfo } = event.payload
     let order = await Order.findOneBy({ oid })
     if (order == null) {
         order = new Order()
@@ -167,6 +167,7 @@ export async function handleCreateOrderEvent(event: any, scanner: any) {
     order.postage = multyAssetToString(postage)
     order.createTime = createTime
     order.payTimeOut = payTimeOut
+    order.receiptInfo = receiptInfo
     await order.save()
 
     let product = await Product.findOneBy({ pid })

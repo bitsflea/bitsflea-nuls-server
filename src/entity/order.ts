@@ -93,4 +93,10 @@ export class Order extends BaseEntity {
      */
     @Column({ nullable: true })
     clearTime: number
+
+    /**
+     * 收货信息cid
+     */
+    @Column({ nullable: true })
+    receiptInfo: string
 }
