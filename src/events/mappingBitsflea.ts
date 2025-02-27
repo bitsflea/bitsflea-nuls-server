@@ -259,7 +259,10 @@ export async function handleReturnEvent(event: any, scanner: any) {
 
         let pr = await getProductReturn(scanner.client, oid)
         if (pr) {
-            let localPr = new ProductReturn()
+            let localPr = await ProductReturn.findOneBy({ oid })
+            if (localPr == null) {
+                localPr = new ProductReturn()
+            }
             localPr.oid = pr.oid
             localPr.pid = pr.pid
             localPr.status = pr.status
