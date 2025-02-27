@@ -280,8 +280,10 @@ export async function handleCompleteOrderEvent(event: any, scanner: any) {
 
         let product = await Product.findOneBy({ pid: order.pid })
         if (product) {
-            product.status = 200
-            await product.save()
+            if (!product.isRetail || (product.isRetail && product.stockCount == 0)) {
+                product.status = 200
+                await product.save()
+            }
         }
 
         let [g, seller, buyer] = await Promise.all([
