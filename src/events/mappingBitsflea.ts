@@ -168,15 +168,17 @@ export async function handleCreateOrderEvent(event: any, scanner: any) {
     order.createTime = createTime
     order.payTimeOut = payTimeOut
     order.receiptInfo = receiptInfo
-    await order.save()
+
 
     let product = await Product.findOneBy({ pid })
     if (product) {
+        order.quantity = Number(BigInt(amount) / BigInt(product.price.split(",")[0]))
         let p = await scanner.client.invokeView(CONTRACT_BITSFLEA, "getProduct", null, [pid])
         product.stockCount = p.stockCount
         product.status = p.status
         await product.save()
     }
+    await order.save()
 }
 
 export async function handlePayOrderEvent(event: any, scanner: any) {
@@ -280,10 +282,11 @@ export async function handleCompleteOrderEvent(event: any, scanner: any) {
 
         let product = await Product.findOneBy({ pid: order.pid })
         if (product) {
-            if (!product.isRetail || (product.isRetail && product.stockCount == 0)) {
+            product.stockCount -= order.quantity
+            if (!product.isRetail || (product.isRetail && product.stockCount <= 0)) {
                 product.status = 200
-                await product.save()
             }
+            await product.save()
         }
 
         let [g, seller, buyer] = await Promise.all([

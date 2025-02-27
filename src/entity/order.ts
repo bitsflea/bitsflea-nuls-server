@@ -99,4 +99,10 @@ export class Order extends BaseEntity {
      */
     @Column({ nullable: true })
     receiptInfo: string
+
+    /**
+     * 购买数量
+     */
+    @Column()
+    quantity: number
 }
