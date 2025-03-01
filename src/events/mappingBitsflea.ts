@@ -172,7 +172,7 @@ export async function handleCreateOrderEvent(event: any, scanner: any) {
 
     let product = await Product.findOneBy({ pid })
     if (product) {
-        order.quantity = Number(BigInt(amount) / BigInt(product.price.split(",")[0]))
+        order.quantity = Number(BigInt(amount.value) / BigInt(product.price.split(",")[0]))
         let p = await scanner.client.invokeView(CONTRACT_BITSFLEA, "getProduct", null, [pid])
         product.stockCount = p.stockCount
         product.status = p.status
