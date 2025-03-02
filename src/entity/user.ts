@@ -35,7 +35,7 @@ export class User extends BaseEntity {
     /**
      * 加密过后的电话
      */
-    @Column()
+    @Column({length:300})
     phoneEncrypt: string
     /**
      * 引荐人地址
