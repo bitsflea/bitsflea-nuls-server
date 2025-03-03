@@ -129,6 +129,7 @@ export async function handleVoteReviewerEvent(event: any, scanner: any) {
             rev.voted = JSON.stringify(vObj)
         }
         await rev.save()
+        await updataUser(reviewer, scanner.client)
     }
 }
 
