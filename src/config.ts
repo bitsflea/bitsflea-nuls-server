@@ -6,7 +6,7 @@ export default {
     debug: true,
     // 轮询间隔（秒）
     POLL_INTERVAL: 5,
-    API_URL: "http://beta.api.nuls.io/jsonrpc",
+    API_URL: "https://api.nuls.io/jsonrpc",
 
     // 数据库
     db_host: "localhost",
@@ -19,7 +19,7 @@ export default {
     start_block: 12324470,
     // 配置合约名映射
     contracts: {
-        "Bitsflea": "tNULSeBaMzYcrWNadQdCunL8JLhKXrvVzDGrFE",
+        "Bitsflea": "NULSd6HgsKDNSpGc8bs8QZ1BoXtPZX6X9EHFt",
     },
-    WNULS: "tNULSeBaMx9aG8vD8rsDorNtGKB4Mc9wpKs127", // NULSd6Hgmqgq924JD5aukswyrqrg6xjpTzH5w
+    WNULS: "NULSd6HgnjgEdarTNnBRGwhHaXU6MUXyHtLLi",
 }
