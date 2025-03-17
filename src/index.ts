@@ -44,7 +44,7 @@ async function main() {
 
     scanner = new Scanner(currentHeight, {
         rpcURL: API_URL,
-        isBeta: true
+        isBeta: config.contracts.Bitsflea.startsWith("tNULS")
     }, AppDataSource)
 
     scanner.startListener()
