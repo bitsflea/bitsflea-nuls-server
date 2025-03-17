@@ -11,12 +11,12 @@ export default {
     // 数据库
     db_host: "localhost",
     db_port: 3306,
-    db_name: "bitsflea",
+    db_name: "bitsflea_main",
     db_username: "root",
     db_password: process.env.DB_PASSWORD,
 
     // 开始扫描的块号
-    start_block: 12324470,
+    start_block: 17328700,
     // 配置合约名映射
     contracts: {
         "Bitsflea": "NULSd6HgsKDNSpGc8bs8QZ1BoXtPZX6X9EHFt",
