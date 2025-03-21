@@ -19,7 +19,7 @@ export default {
     start_block: 17328700,
     // 配置合约名映射
     contracts: {
-        "Bitsflea": "NULSd6HgsKDNSpGc8bs8QZ1BoXtPZX6X9EHFt",
+        "Bitsflea": "NULSd6Hh1LacznpTiQ7K7vKbbnqARVRriZgZM",
     },
     WNULS: "NULSd6HgnjgEdarTNnBRGwhHaXU6MUXyHtLLi",
 }
