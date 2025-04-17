@@ -10,7 +10,7 @@ export default {
 
     // 数据库
     db_host: process.env.DB_HOST ?? "localhost",
-    db_port: process.env.DB_PORT ?? 3306,
+    db_port: parseInt(process.env.DB_PORT) ?? 3306,
     db_name: "bitsflea_main",
     db_username: process.env.DB_USERNAME ?? "root",
     db_password: process.env.DB_PASSWORD,
