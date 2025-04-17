@@ -84,7 +84,12 @@ export class Events {
     checkEvent(event: any): boolean {
         if (this.mapping[event.contractAddress]) {
             let fun = this.mapping[event.contractAddress][event.event]
-            return fun && typeof fun === "function"
+            if (fun && typeof fun === "function") {
+                return true
+            }
+            console.warn("No handler found:", event.contractAddress, event.event)
+        } else {
+            console.warn("No contract found:", event.contractAddress, event.event)
         }
         return false
     }

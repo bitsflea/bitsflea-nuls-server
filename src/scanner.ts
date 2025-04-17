@@ -147,8 +147,6 @@ export class Scanner {
                                 // console.debug("event: ", event);
                                 if (this.events.checkEvent(event)) {
                                     await this.queue.enqueue(event)
-                                } else {
-                                    console.warn("No handler found:", event.contractAddress, event.event)
                                 }
                             }
                         }
@@ -191,8 +189,9 @@ export class Scanner {
                     if (this.listenContracts.includes(event.contractAddress)) {
                         await this.events.processEvent(event, this)
                     } else {
-                        console.warn("No contract found:", event.contractAddress, event.event)
+                        console.warn("No listen contract found:", event.contractAddress, event.event)
                     }
+                    this.processedBlocks = event.blockNumber - 1
                 }
             } catch (error) {
                 console.error("Error process event: ", error)
