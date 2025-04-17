@@ -127,7 +127,7 @@ export class Scanner {
                 // 处理新产生的区块
                 for (let start = this.currentHeight + 1; start <= latestHeight; start += config.batch_block_size) {
                     const end = Math.min(start + config.batch_block_size - 1, latestHeight);
-                    console.debug(`Processing block: [${start}-${end}]... Unprocessed tx count: ${txs.length}`);
+                    console.info(`Processing block: [${start}-${end}]... Unprocessed tx count: ${txs.length}`);
                     const transactions = await this.getContractTransactions(start, end);
                     // console.log(transactions)
                     txs = txs.concat(transactions.map((tx: any) => ({ hash: tx.hash, timestamp: tx.timestamp, inBlockIndex: tx.inBlockIndex, from: getSender(tx.txDataHex) })));
