@@ -12,6 +12,7 @@ export class Scanner {
     db: DataSource
     client: NULSAPI
     currentHeight: number
+    processedBlocks: number
     listenContracts: Array<string>
     maxRequest: number
     queue: AsyncDataQueue
@@ -24,6 +25,7 @@ export class Scanner {
     constructor(currentHeight: number, nulsConfg: any, db: DataSource) {
         this.db = db
         this.currentHeight = typeof currentHeight !== "number" ? parseInt(currentHeight) : currentHeight;
+        this.processedBlocks = this.currentHeight
         this.maxRequest = 50
         this.client = new NULSAPI(nulsConfg)
         this.listenContracts = Object.values(contracts)
@@ -70,10 +72,13 @@ export class Scanner {
         return await this.client.getLatestHeight();
     }
 
-    async getContractTransactions(blockHeight: number) {
-        const block = await this.client.getBlockByHeight(blockHeight);
-        // console.log("block", block);
-        const transactions = block.txs.filter((tx: any) => tx.type === 16 && tx.status === 1); // 16: 合约交易类型
+    async getContractTransactions(startBlock: number, endBlock: number) {
+        const blocks = await this.client.getBlocks(startBlock, endBlock);
+        let transactions = []
+        for (const block of blocks) {
+            const txs = block.txs.filter((tx: any) => tx.type === 16 && tx.status === 1); // 16: 合约交易类型
+            transactions = transactions.concat(txs)
+        }
         // console.log("transactions:", JSON.stringify(transactions));
         return transactions;
     }
@@ -120,14 +125,15 @@ export class Scanner {
                 let txs = [];
                 let unprocessedBlocks = 0;
                 // 处理新产生的区块
-                for (let height = this.currentHeight + 1; height <= latestHeight; height++) {
-                    console.debug(`Processing block: ${height}... Unprocessed tx count: ${txs.length}`);
-                    const transactions = await this.getContractTransactions(height);
+                for (let start = this.currentHeight + 1; start <= latestHeight; start += config.batch_block_size) {
+                    const end = Math.min(start + config.batch_block_size - 1, latestHeight);
+                    console.debug(`Processing block: [${start}-${end}]... Unprocessed tx count: ${txs.length}`);
+                    const transactions = await this.getContractTransactions(start, end);
                     // console.log(transactions)
                     txs = txs.concat(transactions.map((tx: any) => ({ hash: tx.hash, timestamp: tx.timestamp, inBlockIndex: tx.inBlockIndex, from: getSender(tx.txDataHex) })));
                     unprocessedBlocks += 1;
                     // console.log("txHashs:", txHashs);
-                    if (height == latestHeight || txs.length >= this.maxRequest || (unprocessedBlocks >= 10 && txs.length > 0) || (!this.isRun && txs.length > 0)) {
+                    if (end == latestHeight || txs.length >= this.maxRequest || (unprocessedBlocks >= 10 && txs.length > 0) || (!this.isRun && txs.length > 0)) {
                         const events = await this.parseContractEventLogs(txs);
                         // console.log("events:", events)
                         if (events.length > 0) {
@@ -139,8 +145,11 @@ export class Scanner {
                             })
                             for (let event of events) {
                                 // console.debug("event: ", event);
-                                // await this.events.processEvent(event, this);
-                                await this.queue.enqueue(event)
+                                if (this.events.checkEvent(event)) {
+                                    await this.queue.enqueue(event)
+                                } else {
+                                    console.warn("No handler found:", event.contractAddress, event.event)
+                                }
                             }
                         }
                         txs = [];
@@ -148,7 +157,7 @@ export class Scanner {
                     }
 
                     if (!this.isRun) {
-                        this.currentHeight = height;
+                        this.currentHeight = end;
                         break;
                     }
                     await this.sleep(0.5);
@@ -177,9 +186,13 @@ export class Scanner {
         while (this.isRun) {
             try {
                 let event = await this.queue.dequeue()
-                console.debug("event:", event)
-                if (event && this.listenContracts.includes(event.contractAddress)) {
-                    await this.events.processEvent(event, this)
+                if (event) {
+                    console.info(`Queue count: ${this.queue.pendingResolvers.length}/${this.queue.queue.length}`, event.contractAddress, event.event)
+                    if (this.listenContracts.includes(event.contractAddress)) {
+                        await this.events.processEvent(event, this)
+                    } else {
+                        console.warn("No contract found:", event.contractAddress, event.event)
+                    }
                 }
             } catch (error) {
                 console.error("Error process event: ", error)

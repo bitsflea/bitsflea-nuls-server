@@ -23,7 +23,7 @@ process.on('SIGINT', async function () {
     console.info("\nService is stopping...");
     if (scanner) {
         await scanner.stop()
-        localStorage.setItem(CACHE_KEY_CURRENTHEIGHT, scanner.currentHeight)
+        localStorage.setItem(CACHE_KEY_CURRENTHEIGHT, scanner.processedBlocks)
         server.http().close()
         scanner = null
     }

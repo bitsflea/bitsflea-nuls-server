@@ -72,11 +72,17 @@ export class Events {
      * @param scanner 
      */
     async processEvent(event: any, scanner: any) {
+        console.debug("event:", event)
         let fun = this.mapping[event.contractAddress][event.event]
         if (fun && typeof fun === "function") {
             await fun(event, scanner);
         } else {
             console.warn("No handler found:", event.contractAddress, event.event)
         }
+    }
+
+    checkEvent(event: any): boolean {
+        let fun = this.mapping[event.contractAddress][event.event]
+        return fun && typeof fun === "function"
     }
 }
