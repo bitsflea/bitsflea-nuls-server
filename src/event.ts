@@ -82,7 +82,10 @@ export class Events {
     }
 
     checkEvent(event: any): boolean {
-        let fun = this.mapping[event.contractAddress][event.event]
-        return fun && typeof fun === "function"
+        if (this.mapping[event.contractAddress]) {
+            let fun = this.mapping[event.contractAddress][event.event]
+            return fun && typeof fun === "function"
+        }
+        return false
     }
 }
